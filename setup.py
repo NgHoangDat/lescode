@@ -5,6 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="quiver",
+    packages=["quiver"],
     version="0.1.0",
     author="nghoangdat",
     author_email="18.hoang.dat.12@gmail.com",
