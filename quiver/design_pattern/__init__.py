@@ -1,0 +1,1 @@
+from .design_pattern import *
