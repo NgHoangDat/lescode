@@ -4,16 +4,16 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="quiver",
-    packages=["quiver"],
+    name="awesome_quiver",
+    packages=setuptools.find_packages(),
     version="0.1.0",
     author="nghoangdat",
     author_email="18.hoang.dat.12@gmail.com",
     description="quiver",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/NgHoangDat/quiver.git",
-    download_url="https://github.com/NgHoangDat/quiver/archive/v0.1.0.tar.gz",
+    url="https://github.com/NgHoangDat/awesome_quiver.git",
+    download_url="https://github.com/NgHoangDat/awesome_quiver/archive/v0.1.0.tar.gz",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
