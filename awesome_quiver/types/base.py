@@ -85,7 +85,6 @@ def serialize(obj, datetime_fmt:str="%Y-%m-%d %H:%M:%S.%f", **kwargs):
     return msgpack.packb(asdict(obj), default=get_datetime_encoder(datetime_fmt), use_bin_type=True, **kwargs)
 
 
-def deserialize(cls, dump:Optional[bytes]=None, accept_none:bool=False, datetime_fmt:str="%Y-%m-%d %H:%M:%S.%f", **kwargs):
-    if dump is None and not accept_none:
-        return partial(deserialize, cls, accept_none=True)
+@curry
+def deserialize(cls, dump:bytes, datetime_fmt:str="%Y-%m-%d %H:%M:%S.%f", **kwargs):
     return asclass(cls, msgpack.unpackb(dump, object_hook=get_datetime_decoder(datetime_fmt), raw=False, **kwargs))
