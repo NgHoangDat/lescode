@@ -1,19 +1,23 @@
 import setuptools
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
+
+
+__VERSION__ = "0.1.3"
+
 
 setuptools.setup(
     name="awesome_quiver",
     packages=setuptools.find_packages(),
-    version="0.1.2",
+    version=__VERSION__,
     author="nghoangdat",
     author_email="18.hoang.dat.12@gmail.com",
     description="quiver",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/NgHoangDat/awesome_quiver.git",
-    download_url="https://github.com/NgHoangDat/awesome_quiver/archive/v0.1.2.tar.gz",
+    download_url=f"https://github.com/NgHoangDat/awesome_quiver/archive/v{__VERSION__}.tar.gz",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

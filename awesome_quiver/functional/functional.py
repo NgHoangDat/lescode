@@ -40,7 +40,6 @@ from toolz.curried import (
     dissoc,
     do,
     drop,
-    excepts,
     filter,
     get,
     get_in,

@@ -3,7 +3,8 @@ from typing import *
 from ..functional import case, compose, is_instance, map
 
 
-BaseLayer = type('BaseLayer', (Mapping,), {})
+class BaseLayer(Mapping):
+    pass
 
 
 def build_layer(keys:Tuple[str, ...], values:Tuple[Any, ...]) -> BaseLayer:

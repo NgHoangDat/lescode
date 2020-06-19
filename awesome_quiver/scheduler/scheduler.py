@@ -113,6 +113,7 @@ def call_after(loop:asyncio.AbstractEventLoop, repeated:bool=False, **timedetail
                 else:
                     future.add_done_callback(lambda _: task.set_state("finished"))
 
+            reschedule()
             return task
 
         setattr(func, 'promise', wrapper)
