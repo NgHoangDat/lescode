@@ -4,11 +4,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
-__VERSION__ = "0.1.3"
+__VERSION__ = "0.2.0"
 
 
 setuptools.setup(
-    name="awesome_quiver",
+    name="lescode",
     packages=setuptools.find_packages(),
     version=__VERSION__,
     author="nghoangdat",
@@ -16,8 +16,8 @@ setuptools.setup(
     description="quiver",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/NgHoangDat/awesome_quiver.git",
-    download_url=f"https://github.com/NgHoangDat/awesome_quiver/archive/v{__VERSION__}.tar.gz",
+    url="https://github.com/NgHoangDat/lescode.git",
+    download_url=f"https://github.com/NgHoangDat/lescode/archive/v{__VERSION__}.tar.gz",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

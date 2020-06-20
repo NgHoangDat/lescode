@@ -1,2 +1,2 @@
-# quiver
-Utility for every python projects
+# lescode
+Less code, more fun
