@@ -1,4 +1,5 @@
 .vscode
+build
 env
 **/__pycache__
 dist
