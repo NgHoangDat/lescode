@@ -89,7 +89,7 @@ def get_config(*args, **kwargs):
     return Config()
 
 
-def load_config(*args, path:Union[str, Path, Type(None)]=None, **kwargs):
+def load_config(*args, path:Union[str, Path, type(None)]=None, **kwargs):
     params = {}
 
     if path:
