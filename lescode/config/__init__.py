@@ -1,2 +1,1 @@
-from .pool import (Config, asclass, asdict, get_config, itemsof, keysof,
-                   load_config, valuesof)
+from .pool import Config, get_config, load_config
