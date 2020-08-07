@@ -64,10 +64,10 @@ def valuesof(namespace:BaseNamespace) -> Iterator[Any]:
 
 
 def asdict(namespace:BaseNamespace):
-    parse_tuple = compose(
-        tuple, 
-        map(case(predicate=is_instance(BaseNamespace), action=asdict))
-    )
+    parse_tuple = lambda val: tuple(map(
+        case(predicate=is_instance(BaseNamespace), action=asdict),
+        val
+    ))
 
     parse = case(
         predicate=is_instance(BaseNamespace),
@@ -82,16 +82,16 @@ def asdict(namespace:BaseNamespace):
 
 
 def asclass(data:Dict[Hashable, Any], **kwargs):
-    parse_list = compose(
-        tuple,
-        map(case(
+    parse_list = lambda val: tuple(map(
+        case(
             predicate=is_instance(dict),
             action=partial(asclass, **kwargs),
             otherwise=case(
                 predicate=is_instance(list),
                 action=parse_list
             )
-        )
+        ),
+        val
     ))
 
     parse = case(
