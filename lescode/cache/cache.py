@@ -15,11 +15,7 @@ from .types import Cache, Number, Policy, State, Timer
 def generate_hash(generator:Callable[[Hashable], Hashable]):
 
     def hash_func(*args, **kwargs):
-        if kwargs:
-            keys, values = zip(*sorted(kwargs.items(), key=operator.itemgetter(0)))
-        else:
-            keys, values = (), ()
-
+        keys, values = zip(*sorted(kwargs.items(), key=operator.itemgetter(0))) if kwargs else ((), ())
         hash_list = lambda lst: hash_func(*lst)
         hash_dict = lambda dct: hash_func(**dct)
 

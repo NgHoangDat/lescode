@@ -276,7 +276,7 @@ def ALL(*args):
     return ATLEAST(len(args), *args)
 
 
-def NONE(**args):
+def NONE(*args):
     return ATMOST(0, *args)
 
 

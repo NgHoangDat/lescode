@@ -3,7 +3,7 @@ import json
 from collections import namedtuple
 from typing import Union
 
-from .functional import case, curry, flip
+from ..functional import case, curry, flip
 
 
 def camel2snake (text:str, **kwargs) -> str:

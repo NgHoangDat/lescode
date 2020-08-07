@@ -205,3 +205,15 @@ def any(*predicates:List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
 @curry
 def sort(iterable:Iterable[Any], key:Callable[[Any], Any]):
     return sorted(iterable, key=key)
+
+
+def partial_update(origin:Dict[Hashable, Any], data:Dict[Hashable, Any]) -> Dict[Hashable, Any]:
+    updated = origin.copy()
+    for key, value in data.items():
+        if key in updated:
+            if type(updated[key]) is dict and type(value) is dict:
+                updated[key] = partial_update(updated[key], value)
+                continue
+        updated[key] = value
+    return updated
+

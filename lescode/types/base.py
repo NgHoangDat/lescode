@@ -1,12 +1,20 @@
 import copy
 import datetime
+from dataclasses import MISSING, _is_dataclass_instance, dataclass
+from dataclasses import field as _field
+from dataclasses import fields, is_dataclass
 from functools import partial
 from typing import *
 
-import msgpack
-from dataclasses import dataclass, field, fields, is_dataclass, _is_dataclass_instance
+from msgpack import packb, unpackb
 
 from ..functional import curry
+
+
+def field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, **kwargs):
+    metadata = metadata or {}
+    metadata.update(kwargs)
+    return _field(default=default, default_factory=default_factory, init=init, repr=repr, hash=hash, compare=compare, metadata=metadata)
 
 
 def get_datetime_decoder(fmt:str="%Y-%m-%d %H:%M:%S.%f"):
@@ -82,9 +90,9 @@ def asdict(obj, *, dict_factory=dict):
 
 
 def serialize(obj, datetime_fmt:str="%Y-%m-%d %H:%M:%S.%f", **kwargs):
-    return msgpack.packb(asdict(obj), default=get_datetime_encoder(datetime_fmt), use_bin_type=True, **kwargs)
+    return packb(asdict(obj), default=get_datetime_encoder(datetime_fmt), use_bin_type=True, **kwargs)
 
 
 @curry
 def deserialize(cls, dump:bytes, datetime_fmt:str="%Y-%m-%d %H:%M:%S.%f", **kwargs):
-    return asclass(cls, msgpack.unpackb(dump, object_hook=get_datetime_decoder(datetime_fmt), raw=False, **kwargs))
+    return asclass(cls, unpackb(dump, object_hook=get_datetime_decoder(datetime_fmt), raw=False, **kwargs))

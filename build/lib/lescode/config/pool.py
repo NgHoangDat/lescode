@@ -2,8 +2,11 @@ import asyncio
 import json
 import logging
 import time
+from datetime import timedelta
 from functools import partial
 from pathlib import Path
+from threading import Thread
+from time import sleep
 from typing import *
 from typing import Callable
 
@@ -79,7 +82,7 @@ class Config:
         else:
             self.detail = data
 
-    async def watch(self, loop:asyncio.AbstractEventLoop, emitter:Callable, refresh:bool=True, partial:bool=True, logger:Optional[logging.Logger]=None, **timedetail):
+    async def watch_async(self, loop:asyncio.AbstractEventLoop, emitter:Callable, refresh:bool=True, partial:bool=True, logger:Optional[logging.Logger]=None, **timedetail):
 
         if not asyncio.iscoroutinefunction(emitter):
             emitter = asyncio.coroutine(emitter)
@@ -98,6 +101,23 @@ class Config:
 
         await observer(ignore_exception=False)
         observer.promise(ignore_exception=True)
+
+    def watch(self, emitter:Callable, refresh:bool=True, partial:bool=True, logger:Optional[logging.Logger]=None, **timedetail):
+        timestamp = timedelta(**timedetail).total_seconds()
+
+        def observer():
+            while True:
+                time.sleep(timestamp)
+                try:
+                    self.__update(emitter(), partial)
+                except Exception as e:
+                    if logger:
+                        logger.error(e)
+
+        self.__update(emitter(), partial)
+        task = Thread(target=observer)
+        task.daemon = True
+        task.start()
 
 
 class ConfigPool:

@@ -12,20 +12,23 @@ FORMATTER = logging.Formatter("[%(asctime)s] [%(levelname)s] [%(filename)s.%(fun
 
 
 @functools.lru_cache(typed=True)
-def init_logger(log_dir:str, name:str, max_bytes:int=10000000, backup_count:int=5, level:int=logging.INFO) -> logging.Logger:
+def init_logger(name:str, log_dir:Optional[str]=None, max_bytes:int=10000000, backup_count:int=5, level:int=logging.INFO) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(level)
-
-    os.makedirs(log_dir, exist_ok=True)
-    log_filename = os.path.join(log_dir, f'{name}.out')
-    add_handler(logger, RotatingFileHandler(log_filename, maxBytes=max_bytes, backupCount=backup_count))
     add_handler(logger, StreamHandler())
+    
+    if log_dir is not None:
+        os.makedirs(log_dir, exist_ok=True)
+        log_filename = os.path.join(log_dir, f'{name}.out')
+        add_handler(logger, RotatingFileHandler(log_filename, maxBytes=max_bytes, backupCount=backup_count))
+    
     return logger
 
 
-def add_handler(logger:logging.Logger, handler:Handler, formatter:logging.Formatter=FORMATTER):
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+def add_handler(logger:logging.Logger, *handlers:List[Handler], formatter:logging.Formatter=FORMATTER):
+    for handler in handlers:
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
 
 def log_error(_func:Optional[Callable]=None, logger:Optional[logging.Logger]=None, return_value:Any=None, swallow_err:bool=False, **options):

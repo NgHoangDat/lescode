@@ -1,2 +1,2 @@
-from .pool import Config, ConfigPool
-from .layer import asdict, asclass, itemsof, keysof, valuesof
+from .pool import (Config, asclass, asdict, get_config, itemsof, keysof,
+                   load_config, valuesof)
