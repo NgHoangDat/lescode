@@ -101,7 +101,7 @@ def load_config(*args, path:Union[str, Path, type(None)]=None, **kwargs):
             if loader is None:
                 raise Exception(f"file format {path.suffix} is not supported")
 
-        params = loader(f)
+            params = loader(f)
 
     config = get_config(*args, **kwargs)
     config.detail = params
