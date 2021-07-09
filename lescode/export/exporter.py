@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-def export(predicate:Callable[[Any], bool], idx:int=1) -> Dict[str, Any]:
+def export(predicate:Callable[[Any], bool], idx:int=1, module:Any=None) -> Dict[str, Any]:
     curr_frame = currentframe()
     call_frame = getouterframes(curr_frame)[idx]
 
@@ -27,9 +27,13 @@ def export(predicate:Callable[[Any], bool], idx:int=1) -> Dict[str, Any]:
     items = {}
     for fn in current_dir.rglob("*.py"):
         path = fn.relative_to(current_dir).as_posix()[:-3]
+        if module is None:
+            target = import_module('.' + path.replace('/', '.'), package=current_dir.stem)
+        else:
+            target = module
 
         members = getmembers(
-            import_module('.' + path.replace('/', '.'), package=current_dir.stem), 
+            target, 
             predicate=predicate
         )
 
@@ -43,6 +47,6 @@ def export(predicate:Callable[[Any], bool], idx:int=1) -> Dict[str, Any]:
     return items
 
 
-def export_subclass(*classes) -> Dict[str, Any]:
+def export_subclass(*classes, module:Any=None) -> Dict[str, Any]:
     predicate = lambda cls: isclass(cls) and issubclass(cls, classes)
-    return export(predicate, idx=2)
+    return export(predicate, idx=2, module=module)
