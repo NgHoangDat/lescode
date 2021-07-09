@@ -11,13 +11,19 @@ __all__ = [
 
 def export(predicate:Callable[[Any], bool], idx:int=1, module:Any=None) -> Dict[str, Any]:
     curr_frame = currentframe()
-    call_frame = getouterframes(curr_frame)[idx]
+    outer_frames = getouterframes(curr_frame)
+
+    call_frame = outer_frames[idx]
+    orig_frame = outer_frames[-1]
+
+    call_dir = Path(orig_frame.frame.f_globals['__file__']).resolve().parent
 
     _globals = call_frame.frame.f_globals
     _locals = call_frame.frame.f_locals
 
     current_file = Path(_globals['__file__']).resolve()
     current_dir = current_file.parent
+    package = current_dir.relative_to(call_dir).as_posix().replace('/', '.')
 
     if '__all__' not in _globals:
         _globals['__all__'] = []
@@ -28,7 +34,7 @@ def export(predicate:Callable[[Any], bool], idx:int=1, module:Any=None) -> Dict[
     for fn in current_dir.rglob("*.py"):
         path = fn.relative_to(current_dir).as_posix()[:-3]
         if module is None:
-            target = import_module('.' + path.replace('/', '.'), package=current_dir.stem)
+            target = import_module('.' + path.replace('/', '.'), package=package)
         else:
             target = module
 
