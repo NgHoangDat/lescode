@@ -3,10 +3,9 @@ import json
 import logging
 import time
 from datetime import timedelta
-from functools import partial, lru_cache
+from functools import lru_cache
 from pathlib import Path
 from threading import Thread
-from time import sleep
 from typing import *
 from typing import Callable
 
@@ -14,7 +13,9 @@ from yaml import Loader, load
 
 from ..functional import partial_update
 from ..scheduler import call_after
-from ..namespace import BaseNamespace, asclass, asdict, read
+from ..namespace import asclass, asdict, read
+
+NoneType = type(None)
 
 
 def load_yaml(stream):
@@ -89,7 +90,7 @@ def get_config(*args, **kwargs):
     return Config()
 
 
-def load_config(*args, path:Union[str, Path, type(None)]=None, **kwargs):
+def load_config(*args, path:Union[str, Path, NoneType]=None, **kwargs):
     params = {}
 
     if path:
