@@ -38,7 +38,9 @@ def export(predicate:Callable[[Any], bool], idx:int=1, module:Any=None, package:
         for frame in reversed(outer_frames):
             call_dir = Path(frame.frame.f_globals['__file__']).resolve().parent
             if current_dir.as_posix().startswith(call_dir.as_posix()):
-                package = current_dir.relative_to(call_dir).as_posix().replace('/', '.')
+                package = frame.frame.f_globals["__package__"]
+                subpackage = current_dir.relative_to(call_dir).as_posix().replace('/', '.')
+                package = f"{package}.{subpackage}" if package else subpackage
                 break
 
     if '__all__' not in _globals:
@@ -48,11 +50,7 @@ def export(predicate:Callable[[Any], bool], idx:int=1, module:Any=None, package:
 
     for fn in current_dir.rglob("*.py"):
         path = fn.relative_to(current_dir).as_posix()[:-3]
-        # print(path, package)
-        if module is None:
-            target = import_module('.' + path.replace('/', '.'), package=package)
-        else:
-            target = module
+        target = module or import_module('.' + path.replace('/', '.'), package=package)
 
         members = getmembers(
             target, 
@@ -70,4 +68,9 @@ def export(predicate:Callable[[Any], bool], idx:int=1, module:Any=None, package:
 
 def export_subclass(*classes, module:Any=None, package:str=None, registry:Dict[str, Any]=None):
     predicate = lambda cls: isclass(cls) and issubclass(cls, classes)
+    export(predicate, idx=2, module=module, package=package, registry=registry)
+
+
+def export_instance(*classes, module:Any=None, package:str=None, registry:Dict[str, Any]=None):
+    predicate = lambda ins: isinstance(ins, classes)
     export(predicate, idx=2, module=module, package=package, registry=registry)
