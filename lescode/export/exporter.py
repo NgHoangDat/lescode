@@ -6,7 +6,8 @@ from functools import lru_cache
 
 __all__ = [
     'export',
-    'export_subclass'
+    'export_subclass',
+    'export_instance'
 ]
 
 

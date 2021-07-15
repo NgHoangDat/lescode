@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
-__VERSION__ = "0.2.11.4"
+__VERSION__ = "0.2.11.5"
 
 
 setuptools.setup(
