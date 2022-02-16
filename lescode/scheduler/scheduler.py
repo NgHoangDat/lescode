@@ -11,22 +11,22 @@ from .time import get_next_runtime
 
 
 class Scheduler:
-
-    def __init__(self, loop:asyncio.AbstractEventLoop):
+    def __init__(self, loop: asyncio.AbstractEventLoop):
         self.loop = loop
-        self.tasks:List[Task] = []
-        self.actions:List[Callable] = []
+        self.tasks: List[Task] = []
+        self.actions: List[Callable] = []
 
-    def schedule(self, caller:Optional[Callable], repeated:bool=False, **timedetail):
-
-        def decorator(func:Callable):
+    def schedule(
+        self, caller: Optional[Callable], repeated: bool = False, **timedetail
+    ):
+        def decorator(func: Callable):
             task = Task()
             handle = func
 
             for key, value in func.__annotations__.items():
                 if value is Task:
                     handle = partial(handle, **{key: task})
-                
+
                 if value is Scheduler:
                     handle = partial(handle, **{key: self})
 
@@ -47,10 +47,8 @@ class Scheduler:
             action()
 
 
-def call_at(loop:asyncio.AbstractEventLoop, repeated:bool=False, **timedetail):
-
+def call_at(loop: asyncio.AbstractEventLoop, repeated: bool = False, **timedetail):
     def decorator(func, **options):
-
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Task:
             action = partial(func, *args, **{**options, **kwargs})
@@ -65,10 +63,12 @@ def call_at(loop:asyncio.AbstractEventLoop, repeated:bool=False, **timedetail):
                 next_run = get_next_runtime(datetime.now(), **timedetail)
 
                 if next_run:
-                    timestamp = next_run.timestamp() - datetime.now().timestamp() + loop.time()
+                    timestamp = (
+                        next_run.timestamp() - datetime.now().timestamp() + loop.time()
+                    )
                     task.handle = loop.call_at(when=timestamp, callback=run)
                 else:
-                    task.set_state('finished')
+                    task.set_state("finished")
 
             def run():
                 task.set_state("running")
@@ -81,16 +81,14 @@ def call_at(loop:asyncio.AbstractEventLoop, repeated:bool=False, **timedetail):
             reschedule()
             return task
 
-        setattr(func, 'promise', wrapper)
+        setattr(func, "promise", wrapper)
         return func
 
     return decorator
 
 
-def call_after(loop:asyncio.AbstractEventLoop, repeated:bool=False, **timedetail):
-
+def call_after(loop: asyncio.AbstractEventLoop, repeated: bool = False, **timedetail):
     def decorator(func, **options):
-
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             action = partial(func, *args, **{**options, **kwargs})
@@ -116,7 +114,7 @@ def call_after(loop:asyncio.AbstractEventLoop, repeated:bool=False, **timedetail
             reschedule()
             return task
 
-        setattr(func, 'promise', wrapper)
+        setattr(func, "promise", wrapper)
         return func
 
     return decorator

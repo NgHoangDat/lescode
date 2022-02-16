@@ -11,7 +11,7 @@ except ImportError:
 try:
     from re import Pattern
 except ImportError:
-    Pattern = type(re.compile('', 0))
+    Pattern = type(re.compile("", 0))
 
 
 Matcher = Callable[[Any, Any], bool]

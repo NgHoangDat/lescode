@@ -6,7 +6,8 @@ from typing import *
 from typing import Callable
 
 from toolz.curried import (
-    apply, comp,
+    apply,
+    comp,
     complement,
     compose,
     compose_left,
@@ -31,7 +32,8 @@ from toolz.curried import (
     second,
     thread_first,
     thread_last,
-    merge, merge_with,
+    merge,
+    merge_with,
     accumulate,
     assoc,
     assoc_in,
@@ -78,7 +80,13 @@ from toolz.curried import (
 
 
 @curry
-def case(x:Any, *, predicate:Callable[..., bool], action:Callable[..., Any], otherwise:Optional[Callable[..., Any]]=None) -> Any:
+def case(
+    x: Any,
+    *,
+    predicate: Callable[..., bool],
+    action: Callable[..., Any],
+    otherwise: Optional[Callable[..., Any]] = None
+) -> Any:
     if predicate(x):
         return action(x)
     elif otherwise:
@@ -87,8 +95,7 @@ def case(x:Any, *, predicate:Callable[..., bool], action:Callable[..., Any], oth
         return x
 
 
-def mock(value:Any, raw:bool=True):
-
+def mock(value: Any, raw: bool = True):
     def func(*args, **kwargs):
         if callable(value) and not raw:
             return value()
@@ -97,13 +104,17 @@ def mock(value:Any, raw:bool=True):
     return func
 
 
-def excepts(_func:Optional[Callable]=None, exception:Type[Exception]=Exception, handler:Optional[Callable]=None):
-
-    def decorator(func:Callable):
+def excepts(
+    _func: Optional[Callable] = None,
+    exception: Type[Exception] = Exception,
+    handler: Optional[Callable] = None,
+):
+    def decorator(func: Callable):
         if not exception:
             return func
 
         if asyncio.iscoroutinefunction(func) or asyncio.iscoroutinefunction(handler):
+
             async def wrapper(*args, **kwargs):
                 try:
                     if asyncio.iscoroutinefunction(func):
@@ -113,7 +124,9 @@ def excepts(_func:Optional[Callable]=None, exception:Type[Exception]=Exception, 
                     if asyncio.iscoroutinefunction(handler):
                         return await handler(*args, **kwargs)
                     return handler(*args, **kwargs)
+
         else:
+
             def wrapper(*args, **kwargs):
                 try:
                     return func(*args, **kwargs)
@@ -129,47 +142,49 @@ def excepts(_func:Optional[Callable]=None, exception:Type[Exception]=Exception, 
 
 
 @curry
-def eq(this:Any, that:Any) -> bool:
+def eq(this: Any, that: Any) -> bool:
     return op.eq(this, that)
 
 
 @curry
-def gt(this:Any, that:Any) -> bool:
+def gt(this: Any, that: Any) -> bool:
     return op.gt(this, that)
 
 
 @curry
-def lt(this:Any, that:Any) -> bool:
+def lt(this: Any, that: Any) -> bool:
     return op.lt(this, that)
 
 
 @curry
-def ge(this:Any, that:Any) -> bool:
+def ge(this: Any, that: Any) -> bool:
     return op.ge(this, that)
 
 
 @curry
-def le(this:Any, that:Any) -> bool:
+def le(this: Any, that: Any) -> bool:
     return op.le(this, that)
 
 
 @curry
-def is_instance(bases:Union[Type, Tuple[Type, ...]], obj:Any) -> bool:
+def is_instance(bases: Union[Type, Tuple[Type, ...]], obj: Any) -> bool:
     return isinstance(obj, bases)
 
 
 @curry
-def is_subclass(bases:Union[Type, Tuple[Type, ...]], cls:Type) -> bool:
+def is_subclass(bases: Union[Type, Tuple[Type, ...]], cls: Type) -> bool:
     return issubclass(cls, bases)
 
 
 @curry
-def is_in(collection:Union[List[Any], Dict[Any, Any], Tuple[Any, ...]], val:Any) -> bool:
+def is_in(
+    collection: Union[List[Any], Dict[Any, Any], Tuple[Any, ...]], val: Any
+) -> bool:
     return val in collection
 
 
 @curry
-def peek_nth(index:int, seq:List[Any], default:Optional[Any]=None) -> Any:
+def peek_nth(index: int, seq: List[Any], default: Optional[Any] = None) -> Any:
     if is_instance((list, tuple), seq):
         if 0 <= index < len(seq):
             return seq[index]
@@ -182,7 +197,7 @@ def peek_nth(index:int, seq:List[Any], default:Optional[Any]=None) -> Any:
     return default
 
 
-def all(*predicates:List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
+def all(*predicates: List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
     def func(*args, **kwargs):
         for predicate in predicates:
             if not predicate(*args, **kwargs):
@@ -192,7 +207,7 @@ def all(*predicates:List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
     return func
 
 
-def any(*predicates:List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
+def any(*predicates: List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
     def func(*args, **kwargs):
         for predicate in predicates:
             if predicate(*args, **kwargs):
@@ -203,11 +218,13 @@ def any(*predicates:List[Callable[[Any], bool]]) -> Callable[[Any], bool]:
 
 
 @curry
-def sort(iterable:Iterable[Any], key:Callable[[Any], Any]):
+def sort(iterable: Iterable[Any], key: Callable[[Any], Any]):
     return sorted(iterable, key=key)
 
 
-def partial_update(origin:Dict[Hashable, Any], data:Dict[Hashable, Any]) -> Dict[Hashable, Any]:
+def partial_update(
+    origin: Dict[Hashable, Any], data: Dict[Hashable, Any]
+) -> Dict[Hashable, Any]:
     updated = origin.copy()
     for key, value in data.items():
         if key in updated:
@@ -216,4 +233,3 @@ def partial_update(origin:Dict[Hashable, Any], data:Dict[Hashable, Any]) -> Dict
                 continue
         updated[key] = value
     return updated
-

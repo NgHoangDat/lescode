@@ -22,14 +22,10 @@ def load_yaml(stream):
     return load(stream, Loader=Loader) or {}
 
 
-LOADER = {
-    '.json': json.load,
-    '.yaml': load_yaml,
-    '.yml': load_yaml
-}
+LOADER = {".json": json.load, ".yaml": load_yaml, ".yml": load_yaml}
+
 
 class Config:
-
     def __init__(self):
         self.__detail = None
 
@@ -38,22 +34,30 @@ class Config:
         return self.__detail
 
     @detail.setter
-    def detail(self, params:Dict[Hashable, Any]):
+    def detail(self, params: Dict[Hashable, Any]):
         self.__detail = asclass(params)
 
-    def get(self, *keys, shallow_search:bool=True, default:Any=None, **kwargs):
+    def get(self, *keys, shallow_search: bool = True, default: Any = None, **kwargs):
         return read(self.detail, *keys, shallow_search=shallow_search, default=default)
 
-    def __update(self, data:Dict[Hashable, Any], partial:bool=True):
+    def __update(self, data: Dict[Hashable, Any], partial: bool = True):
         self.detail = partial_update(asdict(self.detail), data) if partial else data
 
-    async def watch_async(self, loop:asyncio.AbstractEventLoop, emitter:Callable, refresh:bool=True, partial:bool=True, logger:Optional[logging.Logger]=None, **timedetail):
+    async def watch_async(
+        self,
+        loop: asyncio.AbstractEventLoop,
+        emitter: Callable,
+        refresh: bool = True,
+        partial: bool = True,
+        logger: Optional[logging.Logger] = None,
+        **timedetail,
+    ):
 
         if not asyncio.iscoroutinefunction(emitter):
             emitter = asyncio.coroutine(emitter)
 
         @call_after(loop, repeated=refresh, **timedetail)
-        async def observer(ignore_exception:bool=True):
+        async def observer(ignore_exception: bool = True):
             try:
                 data = await emitter()
                 self.__update(data, partial)
@@ -67,7 +71,14 @@ class Config:
         await observer(ignore_exception=False)
         observer.promise(ignore_exception=True)
 
-    def watch(self, emitter:Callable, refresh:bool=True, partial:bool=True, logger:Optional[logging.Logger]=None, **timedetail):
+    def watch(
+        self,
+        emitter: Callable,
+        refresh: bool = True,
+        partial: bool = True,
+        logger: Optional[logging.Logger] = None,
+        **timedetail,
+    ):
         timestamp = timedelta(**timedetail).total_seconds()
 
         def observer():
@@ -90,14 +101,14 @@ def get_config(*args, **kwargs):
     return Config()
 
 
-def load_config(*args, path:Union[str, Path, NoneType]=None, **kwargs):
+def load_config(*args, path: Union[str, Path, NoneType] = None, **kwargs):
     params = {}
 
     if path:
         if type(path) is str:
             path = Path(path)
 
-        with open(path, encoding='utf-8') as f:
+        with open(path, encoding="utf-8") as f:
             loader = LOADER.get(path.suffix)
             if loader is None:
                 raise Exception(f"file format {path.suffix} is not supported")
