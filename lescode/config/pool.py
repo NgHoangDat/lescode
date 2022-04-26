@@ -1,5 +1,6 @@
 import asyncio
 import json
+from lib2to3.pytree import Base
 import logging
 import time
 from datetime import timedelta
@@ -28,6 +29,9 @@ LOADER = {".json": json.load, ".yaml": load_yaml, ".yml": load_yaml}
 class Config:
     def __init__(self):
         self.__detail = None
+
+    def astype(self, dtype: Type):
+        return dtype(**asdict(self.detail))
 
     @property
     def detail(self):
@@ -74,7 +78,7 @@ class Config:
     def watch(
         self,
         emitter: Callable,
-        refresh: bool = True,
+        # refresh: bool = True,
         partial: bool = True,
         logger: Optional[logging.Logger] = None,
         **timedetail,
