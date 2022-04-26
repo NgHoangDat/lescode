@@ -18,7 +18,10 @@ def export(
     module: Any = None,
     package: str = None,
     registry: Dict[str, Any] = None,
-):
+) -> Dict[str, Any]:
+    if registry is None:
+        registry = {}
+
     curr_frame = currentframe()
     outer_frames = getouterframes(curr_frame)
     call_frame = outer_frames[idx]
@@ -40,14 +43,15 @@ def export(
     if package is None:
         package = __name__
         for frame in reversed(outer_frames):
-            call_dir = Path(frame.frame.f_globals["__file__"]).resolve().parent
-            if current_dir.as_posix().startswith(call_dir.as_posix()):
-                package = frame.frame.f_globals["__package__"]
-                subpackage = (
-                    current_dir.relative_to(call_dir).as_posix().replace("/", ".")
-                )
-                package = f"{package}.{subpackage}" if package else subpackage
-                break
+            if "__file__" in frame.frame.f_globals:
+                call_dir = Path(frame.frame.f_globals["__file__"]).resolve().parent
+                if current_dir.as_posix().startswith(call_dir.as_posix()):
+                    package = frame.frame.f_globals["__package__"]
+                    subpackage = (
+                        current_dir.relative_to(call_dir).as_posix().replace("/", ".")
+                    )
+                    package = f"{package}.{subpackage}" if package else subpackage
+                    break
 
     cached = _get_cache()
     unique_key = (current_file.as_posix(), call_frame.frame.f_lineno)
@@ -74,19 +78,20 @@ def export(
             _locals[name] = cls
             __all.append(name)
 
-            if registry is not None:
-                registry[name] = cls
+            registry[name] = cls
+
+    return registry
 
 
 def export_subclass(
     *classes, module: Any = None, package: str = None, registry: Dict[str, Any] = None
-):
+) -> Dict[str, Any]:
     predicate = lambda cls: isclass(cls) and issubclass(cls, classes)
-    export(predicate, idx=2, module=module, package=package, registry=registry)
+    return export(predicate, idx=2, module=module, package=package, registry=registry)
 
 
 def export_instance(
     *classes, module: Any = None, package: str = None, registry: Dict[str, Any] = None
-):
+) -> Dict[str, Any]:
     predicate = lambda ins: isinstance(ins, classes)
-    export(predicate, idx=2, module=module, package=package, registry=registry)
+    return export(predicate, idx=2, module=module, package=package, registry=registry)
