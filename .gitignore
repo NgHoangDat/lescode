@@ -6,3 +6,4 @@ env
 dist
 *.egg-info
 **/*.ipynb
+.ipynb_checkpoints
