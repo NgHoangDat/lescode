@@ -1,22 +1,58 @@
 import asyncio
 import functools
+import io
 import logging
-from logging.handlers import RotatingFileHandler
-from logging import Handler, StreamHandler
 import os
 import time
+from logging import Handler, StreamHandler
+from logging.handlers import RotatingFileHandler
 from typing import *
 from typing import Callable
 
 FORMATTER = logging.Formatter(
-    "[%(asctime)s] [%(levelname)s] [%(filename)s.%(funcName)s:%(lineno)i] %(message)s",
+    "[%(asctime)s] [%(process)d %(thread)d] [%(levelname)s] [%(filename)s.%(funcName)s:%(lineno)i] %(message)s",
     "%Y-%m-%d %H:%M:%S",
 )
 
 
+class LoggerWrapper:
+    def __init__(self, logger: logging.Logger) -> None:
+        self.logger = logger
+
+    def __gen_msg(self, *msg) -> str:
+        buffer = io.StringIO()
+        print(*msg, end="", file=buffer)
+        msg = buffer.getvalue()
+        return msg
+
+    def info(self, *msg, stacklevel: int = 2, **kwargs) -> None:
+        return self.logger.info(self.__gen_msg(*msg), stacklevel=stacklevel, **kwargs)
+
+    def debug(self, *msg, stacklevel: int = 2, **kwargs) -> None:
+        return self.logger.debug(self.__gen_msg(*msg), stacklevel=stacklevel, **kwargs)
+
+    def error(self, *msg, stacklevel: int = 2, **kwargs) -> None:
+        return self.logger.error(self.__gen_msg(*msg), stacklevel=stacklevel, **kwargs)
+
+    def exception(self, *msg, stacklevel: int = 2, **kwargs) -> None:
+        return self.logger.exception(
+            self.__gen_msg(*msg), stacklevel=stacklevel, **kwargs
+        )
+
+    def critical(self, *msg, stacklevel: int = 2, **kwargs) -> None:
+        return self.logger.critical(
+            self.__gen_msg(*msg), stacklevel=stacklevel, **kwargs
+        )
+
+    def warning(self, *msg, stacklevel: int = 2, **kwargs) -> None:
+        return self.logger.warning(
+            self.__gen_msg(*msg), stacklevel=stacklevel, **kwargs
+        )
+
+
 @functools.lru_cache(typed=True)
 def init_logger(
-    name: str,
+    name: str = "default",
     log_dir: Optional[str] = None,
     max_bytes: int = 10000000,
     backup_count: int = 5,
@@ -36,7 +72,7 @@ def init_logger(
             ),
         )
 
-    return logger
+    return LoggerWrapper(logger)
 
 
 def add_handler(
@@ -60,8 +96,10 @@ def log_error(
     if logger is None:
         logger = logging.getLogger()
 
-    def decorator(func: Callable):
+    if not isinstance(logger, LoggerWrapper):
+        logger = LoggerWrapper(logger)
 
+    def decorator(func: Callable):
         if asyncio.iscoroutinefunction(func):
 
             @functools.wraps(func)
@@ -69,7 +107,7 @@ def log_error(
                 try:
                     res = await func(*args, **kwargs)
                 except Exception as e:
-                    logger.error(f"{func.__name__}: {e}")
+                    logger.error(f"{func.__name__}: {e}", stacklevel=3)
                     if swallow_err:
                         return return_value
                     else:
@@ -84,7 +122,7 @@ def log_error(
                 try:
                     res = func(*args, **kwargs)
                 except Exception as e:
-                    logger.error(f"{func.__name__}: {e}")
+                    logger.error(f"{func.__name__}: {e}", stacklevel=3)
                     if swallow_err:
                         return return_value
                     else:
@@ -107,8 +145,10 @@ def log_time(
     if logger is None:
         logger = logging.getLogger()
 
-    def decorator(func: callable):
+    if not isinstance(logger, LoggerWrapper):
+        logger = LoggerWrapper(logger)
 
+    def decorator(func: callable):
         if asyncio.iscoroutinefunction(func):
 
             @functools.wraps(func)
@@ -116,7 +156,7 @@ def log_time(
                 start = time.time()
                 res = await func(*args, **kwargs)
                 end = time.time()
-                logger.info(f"{func.__name__}: {end - start}")
+                logger.info(f"{func.__name__}: {end - start}s", stacklevel=3)
                 return res
 
         else:
@@ -126,7 +166,7 @@ def log_time(
                 start = time.time()
                 res = func(*args, **kwargs)
                 end = time.time()
-                logger.info(f"{func.__name__}: {end - start}")
+                logger.info(f"{func.__name__}: {end - start}s", stacklevel=3)
                 return res
 
         return wrapper

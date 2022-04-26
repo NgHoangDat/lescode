@@ -1,0 +1,14 @@
+[2022-04-26 19:56:42] [INFO] [1797674022.py.<module>:1] hello
+[2022-04-26 20:11:12] [INFO] [logger.py.info:29] hello world
+
+[2022-04-26 20:11:45] [INFO] [logger.py.info:29] hello world
+[2022-04-26 20:11:53] [INFO] [logger.py.info:29] hello world
+[2022-04-26 20:11:53] [INFO] [logger.py.info:29] hello 1
+[2022-04-26 20:18:57] [INFO] [1365221883.py.<module>:1] hello world
+[2022-04-26 20:18:57] [INFO] [1365221883.py.<module>:2] hello 1
+[2022-04-26 20:20:08] [INFO] [1365221883.py.<module>:1] hello world
+[2022-04-26 20:20:08] [INFO] [1365221883.py.<module>:2] hello 1
+[2022-04-26 20:21:47] [25704 4371776896] [INFO] [1365221883.py.<module>:1] hello world
+[2022-04-26 20:21:47] [25704 4371776896] [INFO] [1365221883.py.<module>:2] hello 1
+[2022-04-26 20:31:09] [26221 4346185088] [INFO] [logger.py.wrapper:169] test: 1.001235008239746
+[2022-04-26 20:31:54] [26345 4376724864] [INFO] [756179265.py.<module>:1] test: 1.0050771236419678s
